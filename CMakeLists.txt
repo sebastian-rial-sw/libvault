@@ -21,7 +21,7 @@ endif (CURL_FOUND)
 include(GNUInstallDirs)
 include_directories("${PROJECT_SOURCE_DIR}/lib")
 
-add_library(vault SHARED
+add_library(vault STATIC
     include/VaultClient.h
     src/auth/AliCloud.cpp
     src/auth/AppRole.cpp
@@ -116,6 +116,8 @@ set_target_properties(vault PROPERTIES
     PUBLIC_HEADER "include/VaultClient.h")
 
 target_include_directories(vault PRIVATE src)
+
+link_directories(${CURL_INCLUDE_DIR})
 
 if(LINK_CURL)
   target_link_libraries(vault curl)
