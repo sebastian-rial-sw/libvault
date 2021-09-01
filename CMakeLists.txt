@@ -21,6 +21,18 @@ endif (CURL_FOUND)
 include(GNUInstallDirs)
 include_directories("${PROJECT_SOURCE_DIR}/lib")
 
+set(CompilerFlags
+        CMAKE_CXX_FLAGS
+        CMAKE_CXX_FLAGS_DEBUG
+        CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_C_FLAGS
+        CMAKE_C_FLAGS_DEBUG
+        CMAKE_C_FLAGS_RELEASE
+        )
+foreach(CompilerFlag ${CompilerFlags})
+  string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+endforeach()
+
 add_library(vault STATIC
     include/VaultClient.h
     src/auth/AliCloud.cpp
