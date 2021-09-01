@@ -22,7 +22,7 @@ endif (CURL_FOUND)
 include(GNUInstallDirs)
 include_directories("${PROJECT_SOURCE_DIR}/lib")
 
-add_library(vault SHARED
+add_library(vault STATIC
     include/VaultClient.h
     src/auth/AliCloud.cpp
     src/auth/AppRole.cpp
