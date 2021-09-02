@@ -22,17 +22,22 @@ endif (CURL_FOUND)
 include(GNUInstallDirs)
 include_directories("${PROJECT_SOURCE_DIR}/lib")
 
-set(CompilerFlags
-        CMAKE_CXX_FLAGS
-        CMAKE_CXX_FLAGS_DEBUG
-        CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_C_FLAGS
-        CMAKE_C_FLAGS_DEBUG
-        CMAKE_C_FLAGS_RELEASE
-        )
-foreach(CompilerFlag ${CompilerFlags})
-  string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-endforeach()
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
+set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} ${GSS_LINKER_FLAGS}")
+
+#set(CompilerFlags
+#        CMAKE_CXX_FLAGS
+#        CMAKE_CXX_FLAGS_DEBUG
+#        CMAKE_CXX_FLAGS_RELEASE
+#        CMAKE_C_FLAGS
+#        CMAKE_C_FLAGS_DEBUG
+#        CMAKE_C_FLAGS_RELEASE
+#        )
+#foreach(CompilerFlag ${CompilerFlags})
+#  string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+#endforeach()
 
 add_library(vault STATIC
     include/VaultClient.h
@@ -135,6 +140,8 @@ set_target_properties(vault PROPERTIES
 #    BUILDER_STATIC_DEFINE)
 
 
+#find_package(ZLIB)
+#target_link_libraries(vault zlib)
 
 target_include_directories(vault PRIVATE src)
 
@@ -147,78 +154,3 @@ endif(LINK_CURL)
 if (ENABLE_COVERAGE)
   target_link_libraries(vault gcov)
 endif ()
-
-if (UNIX)
-  install(TARGETS vault
-      EXPORT libvaultTargets
-      LIBRARY DESTINATION ${CMAKE_INSTALL_DIR}
-      PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libvault)
-
-  install(EXPORT libvaultTargets
-    NAMESPACE libvault::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libvault)
-
-  include(CMakePackageConfigHelpers)
-
-  configure_package_config_file(
-          ${CMAKE_CURRENT_SOURCE_DIR}/VaultConfig.cmake.in
-          ${CMAKE_CURRENT_BINARY_DIR}/libvaultConfig.cmake
-          INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libvault
-          PATH_VARS
-          CMAKE_INSTALL_LIBDIR)
-
-  write_basic_package_version_file(
-          ${CMAKE_CURRENT_BINARY_DIR}/libvaultConfigVersion.cmake
-          COMPATIBILITY SameMajorVersion)
-
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libvaultConfig.cmake"
-          "${CMAKE_CURRENT_BINARY_DIR}/libvaultConfigVersion.cmake"
-          DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/libvault")
-
-  configure_file(vault.pc.in vault.pc @ONLY)
-  install(FILES "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc"
-          DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
-endif (UNIX)
-
-if (ENABLE_TEST)
-  find_package(Catch2 REQUIRED)
-  enable_testing()
-
-  add_executable(libvault_test test/test.cpp)
-
-  target_include_directories(libvault_test PRIVATE include)
-
-  target_link_libraries(libvault_test vault)
-  target_link_libraries(libvault_test curl)
-  target_link_libraries(libvault_test Catch2::Catch2)
-
-  include(CTest)
-  include(Catch)
-
-  catch_discover_tests(libvault_test)
-
-  if (ENABLE_INTEGRATION_TEST)
-    add_executable(libvault_integration_test
-        test/integration/TestHelpers.h
-        test/integration/AppRoleTests.cpp
-        test/integration/engines/KeyValueTests.cpp
-        test/integration/AuthenticationStrategies.cpp
-        test/integration/engines/TransitTests.cpp
-        test/integration/system/SysTests.cpp
-        test/integration/system/AuthTests.cpp
-        test/integration/engines/TotpTests.cpp
-        test/integration/engines/CubbyholeTests.cpp
-        test/integration/engines/PkiTests.cpp
-        test/integration/engines/RabbitMqTests.cpp
-        test/integration/engines/DatabaseTests.cpp
-        test/integration/TokensTests.cpp)
-
-    target_include_directories(libvault_integration_test PRIVATE include)
-
-    target_link_libraries(libvault_integration_test vault)
-    target_link_libraries(libvault_integration_test curl)
-    target_link_libraries(libvault_integration_test Catch2::Catch2)
-
-    catch_discover_tests(libvault_integration_test)
-  endif ()
-endif (ENABLE_TEST)
