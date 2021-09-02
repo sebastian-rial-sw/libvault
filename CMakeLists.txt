@@ -33,6 +33,8 @@ foreach(CompilerFlag ${CompilerFlags})
   string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
 endforeach()
 
+set(CMAKE_BUILD_TYPE release)
+
 add_library(vault STATIC
     include/VaultClient.h
     src/auth/AliCloud.cpp
