@@ -149,7 +149,7 @@ target_include_directories(vault PRIVATE src)
 link_directories(${CURL_INCLUDE_DIRS})
 
 if(LINK_CURL)
-  target_link_libraries(vault curl)
+  target_link_libraries(vault PRIVATE CURL::libcurl)
 endif(LINK_CURL)
 
 if (ENABLE_COVERAGE)
