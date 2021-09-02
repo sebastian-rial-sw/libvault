@@ -9,14 +9,15 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 option(ENABLE_TEST "Enable tests?" OFF)
 option(ENABLE_INTEGRATION_TEST "Enable integration tests?" OFF)
 option(ENABLE_COVERAGE "Enable gcov code coverage" OFF)
-option(LINK_CURL "Link curl library for vault" OFF)
+option(LINK_CURL "Link curl library for vault" ON)
 
 find_package(CURL)
 if (CURL_FOUND)
-  include_directories(${CURL_INCLUDE_DIR})
+  include_directories(${CURL_INCLUDE_DIRS})
 else (CURL_FOUND)
   message(FATAL_ERROR "CURL not found")
 endif (CURL_FOUND)
+
 
 include(GNUInstallDirs)
 include_directories("${PROJECT_SOURCE_DIR}/lib")
@@ -32,8 +33,6 @@ set(CompilerFlags
 foreach(CompilerFlag ${CompilerFlags})
   string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
 endforeach()
-
-set(CMAKE_BUILD_TYPE release)
 
 add_library(vault STATIC
     include/VaultClient.h
@@ -124,16 +123,17 @@ target_include_directories(vault PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include/>)
 
-#set_target_properties(vault PROPERTIES
-#    VERSION ${PROJECT_VERSION}
-#    SOVERSION 0
-#    PUBLIC_HEADER "include/VaultClient.h")
-
 set_target_properties(vault PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 0
-    PUBLIC_HEADER "include/VaultClient.h"
-    BUILDER_STATIC_DEFINE)
+    PUBLIC_HEADER "include/VaultClient.h")
+
+#set_target_properties(vault PROPERTIES
+#    VERSION ${PROJECT_VERSION}
+#    SOVERSION 0
+#    PUBLIC_HEADER "include/VaultClient.h"
+#    BUILDER_STATIC_DEFINE)
+
 
 
 target_include_directories(vault PRIVATE src)
