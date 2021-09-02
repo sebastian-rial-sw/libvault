@@ -122,10 +122,17 @@ target_include_directories(vault PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include/>)
 
+#set_target_properties(vault PROPERTIES
+#    VERSION ${PROJECT_VERSION}
+#    SOVERSION 0
+#    PUBLIC_HEADER "include/VaultClient.h")
+
 set_target_properties(vault PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 0
-    PUBLIC_HEADER "include/VaultClient.h")
+    PUBLIC_HEADER "include/VaultClient.h"
+    BUILDER_STATIC_DEFINE)
+
 
 target_include_directories(vault PRIVATE src)
 
