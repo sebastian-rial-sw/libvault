@@ -146,7 +146,7 @@ set_target_properties(vault PROPERTIES
 
 target_include_directories(vault PRIVATE src)
 
-link_directories(${CURL_INCLUDE_DIR})
+link_directories(${CURL_INCLUDE_DIRS})
 
 if(LINK_CURL)
   target_link_libraries(vault curl)
